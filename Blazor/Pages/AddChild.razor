@@ -1,0 +1,52 @@
+@page "/AddChild"
+@using Microsoft.AspNetCore.Components
+@using WebAPI.Model
+@using Blazor.Service
+@inject IChildService _childService;
+@inject NavigationManager _navigationManager;
+
+<p>@confirmationMessage</p>
+<h3>Add Child</h3>
+
+
+<EditForm Model="@_newChild" OnValidSubmit="@CreateChild">
+    <DataAnnotationsValidator/>
+    <p>Name</p>
+    <InputText @bind-Value="_newChild.Name"/>
+    <ValidationMessage For="@(()=> _newChild.Name)" />
+    <p>Age</p>
+    <InputNumber @bind-Value="_newChild.Age"/>
+    <ValidationMessage For="@(()=> _newChild.Age)" />
+    <p>Gender</p>
+    <InputText @bind-Value="_newChild.Gender"/>
+    <ValidationMessage For="@(()=> _newChild.Gender)" />
+    <br/>
+    <input type="submit" value="Submit"/>
+   
+</EditForm>
+
+@code {
+    private Child _newChild;
+    private string confirmationMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _newChild = new Child();
+        _newChild.Toys = new List<Toy>();
+        confirmationMessage = "";
+    }
+
+    private async Task CreateChild()
+    {
+        try
+        {
+            await _childService.CreateChild(_newChild);
+            _navigationManager.NavigateTo("/");
+        }
+        catch (Exception e)
+        {
+            confirmationMessage = e.Message;
+        }
+    }
+
+}

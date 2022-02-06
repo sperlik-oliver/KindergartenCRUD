@@ -1,0 +1,83 @@
+@page "/AddToy"
+@using Microsoft.AspNetCore.Components
+@using WebAPI.Model
+@using Blazor.Service
+@inject IChildService _childService;
+@inject IToyService _ToyService;
+@inject NavigationManager _navigationManager;
+
+<p>@confirmationMessage</p>
+<h3>Add Toy</h3>
+
+
+
+<EditForm Model="@_newToy" OnValidSubmit="@CreateToy">
+    <DataAnnotationsValidator/>
+    <p>Name</p>
+    <InputText @bind-Value="_newToy.Name"/>
+    <ValidationMessage For="@(()=> _newToy.Name)" />
+    <p>Color</p>
+    <InputText @bind-Value="_newToy.Color"/>
+    <ValidationMessage For="@(()=> _newToy.Color)" />
+    <p>Condition</p>
+    <InputText @bind-Value="_newToy.Condition"/>
+    <ValidationMessage For="@(()=> _newToy.Condition)" />
+    <br/>
+    <p>Favourite</p>
+    <InputCheckbox @bind-Value="_newToy.IsFavourite">Favourite</InputCheckbox>
+    <ValidationMessage For="@(()=> _newToy.IsFavourite)" />
+    <br/>
+    <p>Child</p>
+    
+        <InputSelect ValueExpression="@(()=>childId)" Value="childId" ValueChanged="@((int value) => OnValueChanged(value))">
+            @if (children != null && children.Any())
+            {
+                @foreach (Child child in children)
+                {
+                    <option value="@child.Id">@child.Name</option>
+                }
+            }
+        </InputSelect>
+    
+
+    <br/>
+    <input type="submit" value="Submit"/>
+   
+</EditForm>
+
+@code {
+    private IList<Child> children;
+    private Toy _newToy;
+   
+    private int childId;
+    private string confirmationMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _newToy = new Toy();
+        children = new List<Child>();
+        children = await _childService.GetAllChildren();
+        confirmationMessage = "";
+        childId = children.First().Id;
+    }
+
+    private async Task CreateToy()
+    {
+        try
+            {
+                await _ToyService.CreateToy(_newToy, childId);
+                _navigationManager.NavigateTo("/");
+            }
+            catch (Exception e)
+            {
+                confirmationMessage = e.Message;
+            }
+    }
+
+    private Task OnValueChanged(int value)
+    {
+        childId = value;
+        return Task.CompletedTask;
+    }
+
+}

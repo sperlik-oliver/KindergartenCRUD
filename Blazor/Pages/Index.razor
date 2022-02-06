@@ -1,0 +1,96 @@
+@page "/"
+@using WebAPI.Model
+@using Blazor.Service
+@using System.Collections.Immutable
+@inject IChildService _childService;
+@inject IToyService _toyService;
+
+<PageTitle>Home</PageTitle>
+
+<p>@_confirmationMessage</p>
+<h1>Home</h1>
+
+@if (_childrenToShow != null && _childrenToShow.Any())
+{
+    foreach (Child child in _childrenToShow.ToImmutableList())
+    {
+        <p>@child.Name is a @child.Age year old @child.Gender. Their toys include:</p>
+        if (child.Toys != null && child.Toys.Any())
+        {
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Color</th>
+                    <th>Is Favourite?</th>
+                    <th>Condition</th>
+                    <th>Delete</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                @foreach (Toy toy in child.Toys.ToImmutableList())
+                {
+                    <tr>
+                        <td>@toy.Name</td>
+                        <td>@toy.Color</td>
+                        <td>@toy.IsFavourite</td>
+                        <td>@toy.Condition</td>
+                        <td><button @onclick="() => DeleteToy(child, toy, toy.Id)">Delete</button></td>
+
+                    </tr>
+                }
+
+
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>No toys found for this child</p>
+        }
+    }
+}
+else
+{
+    <p>No children found</p>
+}
+
+@code {
+
+    private IList<Child> _children;
+    private IList<Child> _childrenToShow;
+    // private IList<Toy> _toys;
+    // private IList<Toy> _toysToShow;
+    private string _confirmationMessage;
+    
+    protected async override Task OnInitializedAsync()
+    {
+        
+        _children = new List<Child>();
+        _children = await _childService.GetAllChildren();
+        _childrenToShow = new List<Child>();
+        _childrenToShow = _children;
+        
+        // _toys = new List<Toy>();
+        // _toys = await _toyService.GetAllToys();
+        // _toysToShow = new List<Toy>();
+        // _toysToShow = _toys;
+
+    }
+
+    private async Task DeleteToy(Child child, Toy toy, int id)
+    {
+        try
+        {
+            child.Toys.Remove(toy);
+            await _toyService.DeleteToy(id);
+            _confirmationMessage = "Delete Successful";
+        }
+        catch (Exception e)
+        {
+            _confirmationMessage = e.Message;
+        }
+    }
+
+}

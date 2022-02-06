@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "uwy77RvUjiJaXPTsnW3brq0jELMZAXBm6EiZ7g8vI/cfsVfzYlRroh8/K3iPE28jKO0SNKoWLaO6JrS4EG3yzg==",
+  "success": true,
+  "projectFilePath": "/Users/oliver/Documents/Code/KindergartenCRUD/Blazor/Blazor.csproj",
+  "expectedPackageFiles": [
+    "/Users/oliver/.nuget/packages/newtonsoft.json/13.0.1/newtonsoft.json.13.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}
